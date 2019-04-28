@@ -1,0 +1,16 @@
+public class IllegalPizza extends Exception{
+
+	/**
+	 * This code is used when an illegal step is made
+	 * The class extends Exception
+	 * @param message  message when IllegalPizza used
+	 * 
+	 * @author Darko Stanisic
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public IllegalPizza(String message) {
+		super(message);
+	}
+}
+
