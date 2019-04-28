@@ -1,0 +1,152 @@
+//Darko Stanisic - 20074106
+
+import java.util.Random;
+import javax.swing.JOptionPane;
+
+public class Assn1_20074106  {	
+	
+	public static void main(String[] args) {
+		game();
+	}
+														
+	static Random generator = new Random(System.currentTimeMillis());		
+	static int randomNum() {							//method generates random numbers to be used for dice roll
+		int roll = generator.nextInt(6) + 1;			//returns a value between 1-6 like a dice
+		return roll;
+	}
+		
+	static void game() {								//calculates total score for each player and toggles between computer and player
+		int totalSumPlayer=0;
+		int totalSumComp=0;
+		boolean toggleTurn = true;
+		while(totalSumPlayer<100 && totalSumComp<100) {	//when argument is false, the game is over because someone has 100 points
+			if(toggleTurn) {
+				System.out.println("Player Turn: ");
+				totalSumPlayer += playerTurn(totalSumPlayer);
+				System.out.println("Total Player Score is: " + totalSumPlayer+"\n");
+				toggleTurn=false;						//player round is over, so toggleTurn becomes false and the computer gets to play
+				}
+			else {
+				System.out.println("Computer Turn: ");
+				totalSumComp += computer(totalSumComp);
+				System.out.println("Total Computer Score is: " + totalSumComp+"\n");
+				toggleTurn=true;						//computer round is over, so toggleTurn becomes true and the player gets to play
+				}
+			}
+			if (totalSumPlayer>=100) {					//player won
+				System.out.println("------CONGRATULATIONS------");
+				}
+			else {										//computer won
+				System.out.println("------Computer Won------");
+				}
+		System.out.println("Total Computer Score is: " + totalSumComp);
+		System.out.println("Total Player Score is: " + totalSumPlayer);
+		System.out.println("------Game Over------");
+	}
+	
+	static int play() {									//method generates the score for one roll
+		int sumRoll = 0;
+		int rollA = randomNum();
+		int rollB= randomNum();
+		System.out.println("The first dice rolls: " + letters(rollA));
+		System.out.println("The second dice rolls: " + letters(rollB));
+			if (rollA==1 && rollB==1) {
+				sumRoll = 25 + 50;						//add 50 to keep track of doubles, only way sumRoll>50 if doubles rolled 
+				return sumRoll;
+			}
+			else if(rollA==1 || rollB==1) {
+				sumRoll=0;
+				return sumRoll;
+			}
+			else if(rollA == rollB) {
+				sumRoll = 2 * (rollA + rollB) + 50;		//add 50 to keep track of doubles, only way sumRoll>50 if doubles rolled 
+				return sumRoll;
+			}
+			else {
+				sumRoll =  rollA + rollB;
+				return sumRoll;
+			}   
+	}
+	
+	static int playerTurn(int totalSumPlayer) {	 	 	//calculates total score for one full round
+		int turnSum=0;									//total sum for one round 
+		boolean rollAgain= true;
+			while(rollAgain) {
+				int score = play();						//gets the sumRoll and places it in the score variable
+				if (score==0) {							//only happens if a 1 is rolled
+					System.out.println("\tThe sum of the rolls is: " + score);
+					JOptionPane.showMessageDialog(null, "Turn is Over" ); 
+					turnSum=0;
+					rollAgain=false;					//turn is passed to other player if double 1's are rolled
+					}
+				else if (score > 50) {					//only have score above 50 if doubles were rolled
+					score = score - 50;					//only want to consider the rolled values, not the 50
+					System.out.println("\tThe sum of the rolls is: " + score);
+					JOptionPane.showMessageDialog(null, "Doubles were rolled, rolling again" ); 
+					turnSum += score;					//rollAgain remains unchanged (true) because forced to roll again
+					}
+				else 	{	
+					turnSum += score;
+					System.out.println("\tThe sum of the rolls is: " + score);
+					System.out.println("\tThe game total would be: " + (turnSum + totalSumPlayer));
+					rollAgain = checkScore( turnSum,  totalSumPlayer,  rollAgain);
+					}
+			}
+		return turnSum;
+	}
+	
+	static boolean checkScore(int turnSum, int totalSumPlayer, boolean rollAgain) {
+		if((turnSum + totalSumPlayer)<100) {			
+			rollAgain = choice();						//if a score of 100 is not reached, a choice of rolling again is given 
+			}	
+		else {
+			rollAgain = false;							//if a score of 100 is reached the game terminates, not allowed to roll again
+			}
+	return rollAgain;									//returns whether will be rolling again or not
+	}
+	
+	static boolean choice() {							//called when asking player has choice to roll again or not
+		int answer=JOptionPane.showConfirmDialog(null, "Want to roll again? " ); 	
+		boolean	rollAgain;
+			if (answer == 0) {							//if they click "yes" 
+				rollAgain = true;
+				}
+			else  {										//if they click "no" or "cancel"
+				rollAgain = false;
+				}
+		return rollAgain;
+	}
+		
+	static int computer(int totalSumComp) {				//How the computer views the game
+		int turnSum=0;
+		boolean toggleTurn=true;
+			while (toggleTurn) {
+			int score = play();							//gets the sumRoll and places it in the score variable
+				if (score>50) {							//only happens when doubles are rolled 
+					score = score - 50;					//only want to keep track of the actual value rolled
+					}
+				turnSum += score;						//add value of the rolls into the turn/round score
+				if (turnSum + totalSumComp<=100) {		//if total score is not over 100, allow the computer to play
+					if (score==0) {
+						turnSum=0;
+						toggleTurn=false;				//if double 1's are rolled, do not roll again
+						}
+					else if (turnSum>20) {				//strategy is want to get a turn Sum of over 20 before letting player roll
+						toggleTurn=false;
+						}
+					else {
+						toggleTurn=true;				//if turn sum over 20 is not reached, keep playing
+					}
+				}
+				else toggleTurn=false;					//if computer score is at 100 stop rolling because computer won
+			}
+		System.out.println("The round score for Computer is: "+turnSum);
+		return turnSum;
+	}
+	
+	static String letters(int digit){					//converts numbers to words 
+		String[] arrayConversion = {"one", "two", "three", "four", "five", "six"};
+		return arrayConversion[digit - 1];
+	}
+	
+}
